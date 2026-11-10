@@ -5,6 +5,8 @@ import { HomePage } from '../pages/HomePage';
 import { HowToPlayPage } from '../pages/HowToPlayPage';
 import { MicCheckPage } from '../pages/MicCheckPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { PackEditorPage } from '../pages/PackEditorPage';
+import { PacksPage } from '../pages/PacksPage';
 import { RoomPage } from '../pages/RoomPage';
 import { SoloPage } from '../pages/SoloPage';
 import { applyTheme, usePrefs } from '../store/prefs';
@@ -29,6 +31,8 @@ export function App() {
         <Route path="/how" element={<HowToPlayPage />} />
         <Route path="/mic" element={<MicCheckPage />} />
         <Route path="/solo" element={<SoloPage />} />
+        <Route path="/packs" element={<PacksPage />} />
+        <Route path="/packs/:id" element={<PackEditorPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toasts />
