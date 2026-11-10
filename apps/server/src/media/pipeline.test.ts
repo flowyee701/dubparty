@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { EFFECT_IDS } from '@dubparty/shared';
+import { EFFECT_IDS, EFFECTS, type EffectId } from '@dubparty/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { LocalDiskAdapter } from '../storage';
 import { configureFfmpeg, resolveFfmpegPaths, runFfmpeg } from './ffmpeg';
@@ -9,6 +9,43 @@ import { buildReviewGraph, buildTakeGraph, gateExpression, stageToFilters } from
 import { createMediaPipeline, MediaTools } from './pipeline';
 
 const SR = 48_000;
+
+function wavFromSamples(samples: Int16Array): Buffer {
+  const data = Buffer.from(samples.buffer, samples.byteOffset, samples.byteLength);
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + data.length, 4);
+  header.write('WAVEfmt ', 8);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(1, 22);
+  header.writeUInt32LE(SR, 24);
+  header.writeUInt32LE(SR * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(data.length, 40);
+  return Buffer.concat([header, data]);
+}
+
+function sineWav(durationS: number, freq: number): Buffer {
+  const samples = new Int16Array(Math.round(durationS * SR));
+  for (let i = 0; i < samples.length; i++) {
+    samples[i] = Math.round(Math.sin((2 * Math.PI * freq * i) / SR) * 16_000);
+  }
+  return wavFromSamples(samples);
+}
+
+/** Основная частота по числу переходов через ноль на участке записи. */
+function zeroCrossingHz(samples: Int16Array, fromS: number, toS: number): number {
+  let crossings = 0;
+  const from = Math.round(fromS * SR);
+  const to = Math.min(samples.length, Math.round(toS * SR));
+  for (let i = from + 1; i < to; i++) {
+    if (samples[i - 1]! < 0 !== samples[i]! < 0) crossings++;
+  }
+  return crossings / 2 / (toS - fromS);
+}
 
 /** WAV с короткими щелчками в заданные моменты (секунды). */
 function clickWav(durationS: number, clicks: number[]): Buffer {
@@ -165,6 +202,28 @@ describe('ffmpeg: обработка дубля и сборка видео', () 
     const [first] = onsets(samples);
     expect(first).toBeDefined();
     expect(Math.abs(first! - 1040)).toBeLessThan(60);
+  });
+
+  it.each(['pitchUp', 'pitchDown', 'helium'] as EffectId[])(
+    'эффект «%s» сдвигает высоту тона ровно на заданный коэффициент',
+    async (effect) => {
+      const stage = EFFECTS[effect].find((st) => st.type === 'pitch');
+      const ratio = stage?.type === 'pitch' ? stage.ratio : 1;
+      const input = path.join(dir, 'sine.wav');
+      writeFileSync(input, sineWav(3, 440));
+      const out = path.join(dir, `pitch-${effect}.wav`);
+      await tools.processTake(input, out, { offsetMs: 0, effect, durationMs: 3000 });
+      const hz = zeroCrossingHz(readWav(out).samples, 1, 2.5);
+      expect(Math.abs(hz - 440 * ratio) / (440 * ratio)).toBeLessThan(0.03);
+    },
+  );
+
+  it('без эффекта высота тона не меняется', async () => {
+    const input = path.join(dir, 'sine.wav');
+    writeFileSync(input, sineWav(3, 440));
+    const out = path.join(dir, 'pitch-none.wav');
+    await tools.processTake(input, out, { offsetMs: 0, effect: 'none', durationMs: 3000 });
+    expect(Math.abs(zeroCrossingHz(readWav(out).samples, 1, 2.5) - 440)).toBeLessThan(3);
   });
 
   it('окна реплик заглушают звук вне своих реплик', async () => {
