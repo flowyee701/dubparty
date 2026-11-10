@@ -10,6 +10,9 @@ export interface Player {
 export async function newPlayer(browser: Browser, name: string): Promise<Player> {
   const context = await browser.newContext();
   const page = await context.newPage();
+  // В Chromium микрофон подменяет сам браузер (флаги фейкового устройства);
+  // в WebKit таких флагов нет, поэтому подставляем генератор тона.
+  if (browser.browserType().name() === 'webkit') await useToneMic(page);
   page.on('pageerror', (err) => console.error(`[${name}] page error:`, err.message));
   return { name, context, page };
 }

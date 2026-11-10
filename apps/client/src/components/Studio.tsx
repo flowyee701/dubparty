@@ -16,7 +16,11 @@ type Phase = 'idle' | 'countdown' | 'recording' | 'review';
 declare global {
   interface Window {
     /** Отладочная информация о последнем дубле — её читают e2e-тесты синхронизации. */
-    __dubparty?: { lastTake: Take | null };
+    __dubparty?: {
+      lastTake?: Take | null;
+      /** Состояние синхронного просмотра: отклонение от времени сервера. */
+      sync?: { driftMs: number; entryId: string | null; playing: boolean };
+    };
   }
 }
 
@@ -104,7 +108,7 @@ export function Studio({
     try {
       const recorded = await current.stop();
       session.current = null;
-      window.__dubparty = { lastTake: recorded };
+      window.__dubparty = { ...window.__dubparty, lastTake: recorded };
       if (recorded.blob.size < 1000) {
         toast.error(t('studio.tooShort'));
         setPhase('idle');

@@ -1,14 +1,20 @@
-import { nicknameSchema, roomCodeSchema, type RoomState } from '@dubparty/shared';
+import { MIN_PLAYERS, nicknameSchema, roomCodeSchema, type RoomState } from '@dubparty/shared';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { unlockAudio } from '../audio/sfx';
 import { Page } from '../components/Layout';
 import { ProfileEditor } from '../components/ProfileEditor';
-import { Button, Card, Notice, Spinner } from '../components/ui';
+import { Button, Card, Modal, Notice, Spinner } from '../components/ui';
 import { useErrorText } from '../lib/hooks';
-import { ApiErr } from '../net/socket';
+import { ApiErr, request } from '../net/socket';
+import { Final } from '../phases/Final';
+import { Intro } from '../phases/Intro';
 import { Lobby } from '../phases/Lobby';
+import { Playback } from '../phases/Playback';
+import { Processing, Recording } from '../phases/Recording';
+import { Results } from '../phases/Results';
+import { Voting } from '../phases/Voting';
 import { usePrefs } from '../store/prefs';
 import { useRoom, type ClosedReason } from '../store/room';
 import { toast } from '../store/toasts';
@@ -117,30 +123,120 @@ export function ConnectionBanner() {
   );
 }
 
+function StartBar({ state }: { state: RoomState }) {
+  const { t } = useTranslation();
+  const errorText = useErrorText();
+  const [busy, setBusy] = useState(false);
+  const isHost = state.hostId === state.youId;
+  const online = state.players.filter((p) => !p.left && p.connected).length;
+  const hostName = state.players.find((p) => p.id === state.hostId)?.nickname ?? '';
+
+  if (!isHost) {
+    return (
+      <p className="text-center text-lg font-semibold text-muted" role="status">
+        {t('lobby.waitingHost', { name: hostName })}
+      </p>
+    );
+  }
+  return (
+    <Button
+      variant="primary"
+      size="lg"
+      className="mx-auto min-w-64"
+      disabled={online < MIN_PLAYERS}
+      loading={busy}
+      onClick={() => {
+        unlockAudio();
+        setBusy(true);
+        request('game:start')
+          .catch((err) => toast.error(errorText(err)))
+          .finally(() => setBusy(false));
+      }}
+    >
+      {t('lobby.start')}
+    </Button>
+  );
+}
+
+/** Полоска над игрой: код комнаты, раунд и выход. */
+function GameBar({ state, onLeave }: { state: RoomState; onLeave(): void }) {
+  const { t } = useTranslation();
+  const [confirm, setConfirm] = useState(false);
+  return (
+    <div className="mb-3 flex items-center justify-between gap-3 text-sm">
+      <p className="font-semibold text-muted">
+        {t('game.codeLabel')}{' '}
+        <span className="font-mono font-black tracking-widest text-text">
+          {state.settings.hideCode ? '••••' : state.code}
+        </span>
+        <span className="mx-2" aria-hidden="true">
+          ·
+        </span>
+        {t('game.roundOf', { n: state.roundIndex + 1, total: state.totalRounds })}
+      </p>
+      <Button size="sm" variant="ghost" onClick={() => setConfirm(true)}>
+        {t('room.leave')}
+      </Button>
+      <Modal
+        open={confirm}
+        onClose={() => setConfirm(false)}
+        title={t('game.leaveTitle')}
+        footer={
+          <>
+            <Button onClick={() => setConfirm(false)}>{t('common.cancel')}</Button>
+            <Button variant="danger" onClick={onLeave}>
+              {t('room.leave')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-muted">{t('game.leaveText')}</p>
+      </Modal>
+    </div>
+  );
+}
+
 function RoomView({ state }: { state: RoomState }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const leave = useRoom((s) => s.leave);
+  const onLeave = () => void leave().then(() => navigate('/'));
+  const { phase, round } = state;
+
+  // Смена фазы объявляется скринридерам и сопровождается прокруткой к началу.
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [phase, round?.index]);
+
   return (
     <>
       <ConnectionBanner />
-      {state.phase === 'lobby' && (
-        <Lobby
-          state={state}
-          footer={
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  void leave().then(() => navigate('/'));
-                }}
-              >
-                {t('room.leave')}
-              </Button>
-            </div>
-          }
-        />
-      )}
+      <p className="sr-only" role="status" aria-live="polite">
+        {t(`phases.${phase}`)}
+      </p>
+      {phase !== 'lobby' && phase !== 'final' && <GameBar state={state} onLeave={onLeave} />}
+      <div key={`${phase}:${round?.index ?? 0}`} className="animate-fade">
+        {phase === 'lobby' && (
+          <Lobby
+            state={state}
+            footer={
+              <div className="flex flex-col items-center gap-3">
+                <StartBar state={state} />
+                <Button variant="ghost" onClick={onLeave}>
+                  {t('room.leave')}
+                </Button>
+              </div>
+            }
+          />
+        )}
+        {phase === 'intro' && round && <Intro state={state} round={round} />}
+        {phase === 'recording' && round && <Recording state={state} round={round} />}
+        {phase === 'processing' && <Processing />}
+        {phase === 'playback' && round && <Playback state={state} round={round} />}
+        {phase === 'voting' && round && <Voting state={state} round={round} />}
+        {phase === 'results' && round && <Results state={state} round={round} />}
+        {phase === 'final' && <Final state={state} onLeave={onLeave} />}
+      </div>
     </>
   );
 }

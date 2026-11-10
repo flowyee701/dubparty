@@ -1,4 +1,11 @@
-import type { ErrorCode, PackDetail, PackSummary, PublicConfig } from '@dubparty/shared';
+import type {
+  EffectId,
+  ErrorCode,
+  PackDetail,
+  PackSummary,
+  PublicConfig,
+  TakeStatus,
+} from '@dubparty/shared';
 import { ApiErr } from './socket';
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -61,4 +68,33 @@ export function saveBlob(blob: Blob, name: string): void {
   a.click();
   a.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+}
+
+/** Отправляет дубль на сервер и ждёт, пока тот его обработает. */
+export async function uploadTake(input: {
+  code: string;
+  token: string;
+  round: number;
+  blob: Blob;
+  mimeType: string;
+  offsetMs: number;
+  effect: EffectId;
+}): Promise<void> {
+  const query = new URLSearchParams({
+    round: String(input.round),
+    offsetMs: String(input.offsetMs),
+    effect: input.effect,
+  });
+  const result = await api<{ status: TakeStatus; errorCode?: ErrorCode }>(
+    `/api/rooms/${input.code}/take?${query.toString()}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': input.mimeType.split(';')[0] || 'application/octet-stream',
+        Authorization: `Bearer ${input.token}`,
+      },
+      body: input.blob,
+    },
+  );
+  if (result.status !== 'ready') throw new ApiErr(result.errorCode ?? 'PROCESSING_FAILED');
 }
