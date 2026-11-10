@@ -34,7 +34,17 @@ export function request<E extends ClientEventName>(
     : [payload: ClientEventInput<E>]
 ): Promise<ClientEventResults[E]> {
   return new Promise((resolve, reject) => {
-    if (!socket.connected) socket.connect();
+    // Сервер недоступен — говорим об этом сразу, а не после десятисекундного ожидания ответа.
+    let settled = false;
+    const onConnectError = () => {
+      if (settled) return;
+      settled = true;
+      reject(new ApiErr('NETWORK'));
+    };
+    if (!socket.connected) {
+      socket.once('connect_error', onConnectError);
+      socket.connect();
+    }
     const timed = socket.timeout(10_000) as unknown as {
       emit(
         event: string,
@@ -43,6 +53,9 @@ export function request<E extends ClientEventName>(
       ): void;
     };
     timed.emit(event, args[0] ?? null, (err, result) => {
+      socket.off('connect_error', onConnectError);
+      if (settled) return;
+      settled = true;
       if (err || !result) reject(new ApiErr('TIMEOUT'));
       else if (result.ok) resolve(result.data);
       else reject(new ApiErr(result.error.code, result.error.message));

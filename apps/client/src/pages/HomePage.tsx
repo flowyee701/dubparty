@@ -27,6 +27,7 @@ export function HomePage() {
   function validNickname(): string | null {
     const parsed = nicknameSchema.safeParse(prefs.nickname);
     if (!parsed.success) {
+      toast.error(t('profile.nicknameRequired'));
       setNickError(t('profile.nicknameRequired'));
       return null;
     }

@@ -34,6 +34,7 @@ function JoinForm({ code }: { code: string }) {
     unlockAudio();
     const nickname = nicknameSchema.safeParse(prefs.nickname);
     if (!nickname.success) {
+      toast.error(t('profile.nicknameRequired'));
       setNickError(t('profile.nicknameRequired'));
       return;
     }

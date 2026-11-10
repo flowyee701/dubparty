@@ -5,7 +5,7 @@ import {
   type Avatar,
   type PlayerColor,
 } from '@dubparty/shared';
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AVATAR_EMOJI, AvatarBubble, cx, Field, TextInput } from './ui';
 
@@ -29,6 +29,12 @@ export function ProfileEditor({
   const { t } = useTranslation();
   const avatarGroup = useId();
   const colorGroup = useId();
+  const nickname = useRef<HTMLInputElement>(null);
+
+  // Ошибка в нике — переводим туда фокус, чтобы её нельзя было не заметить.
+  useEffect(() => {
+    if (error) nickname.current?.focus();
+  }, [error]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,6 +45,7 @@ export function ProfileEditor({
             {(props) => (
               <TextInput
                 {...props}
+                ref={nickname}
                 value={value.nickname}
                 maxLength={NICKNAME_MAX}
                 autoComplete="nickname"
