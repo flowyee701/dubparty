@@ -1,0 +1,237 @@
+{
+  "formatVersion": 1,
+  "id": "demo",
+  "title": "Демо-пак",
+  "description": "Четыре коротких анимации, нарисованные специально для DubParty.",
+  "author": "DubParty",
+  "language": "ru",
+  "license": "CC0-1.0",
+  "clips": [
+    {
+      "id": "robots",
+      "title": "Спор роботов",
+      "video": "clips/robots/video.mp4",
+      "music": "clips/robots/music.m4a",
+      "durationMs": 14000,
+      "characters": [
+        {
+          "id": "beep",
+          "name": "Бип",
+          "color": "#f59e0b"
+        },
+        {
+          "id": "boop",
+          "name": "Буп",
+          "color": "#14b8a6"
+        }
+      ],
+      "lines": [
+        {
+          "id": "l1",
+          "characterId": "beep",
+          "startMs": 1000,
+          "endMs": 3200,
+          "text": "Буп, ты опять съел все батарейки?"
+        },
+        {
+          "id": "l2",
+          "characterId": "boop",
+          "startMs": 3700,
+          "endMs": 5800,
+          "text": "Я их не ел. Я их… заряжал."
+        },
+        {
+          "id": "l3",
+          "characterId": "beep",
+          "startMs": 6200,
+          "endMs": 7200,
+          "text": "Ртом?!"
+        },
+        {
+          "id": "l4",
+          "characterId": "boop",
+          "startMs": 7600,
+          "endMs": 9800,
+          "text": "У каждого свой метод."
+        },
+        {
+          "id": "l5",
+          "characterId": "beep",
+          "startMs": 10300,
+          "endMs": 12800,
+          "text": "Всё, я звоню пылесосу."
+        }
+      ],
+      "attribution": "Сгенерировано для DubParty, CC0"
+    },
+    {
+      "id": "weather",
+      "title": "Прогноз погоды",
+      "video": "clips/weather/video.mp4",
+      "durationMs": 13000,
+      "characters": [
+        {
+          "id": "cloud",
+          "name": "Тучка",
+          "color": "#0ea5e9"
+        }
+      ],
+      "lines": [
+        {
+          "id": "l1",
+          "characterId": "cloud",
+          "startMs": 800,
+          "endMs": 3000,
+          "text": "Добрый вечер! С вами прогноз погоды."
+        },
+        {
+          "id": "l2",
+          "characterId": "cloud",
+          "startMs": 3500,
+          "endMs": 6000,
+          "text": "Завтра ожидается дождь. Из меня."
+        },
+        {
+          "id": "l3",
+          "characterId": "cloud",
+          "startMs": 6600,
+          "endMs": 9000,
+          "text": "Послезавтра — тоже я. Простите."
+        },
+        {
+          "id": "l4",
+          "characterId": "cloud",
+          "startMs": 9600,
+          "endMs": 12000,
+          "text": "Зонтики продаются в фойе."
+        }
+      ],
+      "attribution": "Сгенерировано для DubParty, CC0"
+    },
+    {
+      "id": "catdog",
+      "title": "Кот и пёс",
+      "video": "clips/catdog/video.mp4",
+      "durationMs": 15000,
+      "characters": [
+        {
+          "id": "cat",
+          "name": "Кот",
+          "color": "#fb923c"
+        },
+        {
+          "id": "dog",
+          "name": "Пёс",
+          "color": "#a16207"
+        }
+      ],
+      "lines": [
+        {
+          "id": "l1",
+          "characterId": "dog",
+          "startMs": 800,
+          "endMs": 3000,
+          "text": "Слушай, а зачем ты скинул вазу?"
+        },
+        {
+          "id": "l2",
+          "characterId": "cat",
+          "startMs": 3500,
+          "endMs": 5400,
+          "text": "Она на меня смотрела."
+        },
+        {
+          "id": "l3",
+          "characterId": "dog",
+          "startMs": 5900,
+          "endMs": 7600,
+          "text": "У вазы нет глаз."
+        },
+        {
+          "id": "l4",
+          "characterId": "cat",
+          "startMs": 8100,
+          "endMs": 10400,
+          "text": "Теперь точно нет."
+        },
+        {
+          "id": "l5",
+          "characterId": "dog",
+          "startMs": 10900,
+          "endMs": 13600,
+          "text": "Хозяин идёт. Скажем, что это был хомяк."
+        }
+      ],
+      "attribution": "Сгенерировано для DubParty, CC0"
+    },
+    {
+      "id": "space",
+      "title": "Связь с Землёй",
+      "video": "clips/space/video.mp4",
+      "music": "clips/space/music.m4a",
+      "durationMs": 16000,
+      "characters": [
+        {
+          "id": "captain",
+          "name": "Капитан",
+          "color": "#3b82f6"
+        },
+        {
+          "id": "navigator",
+          "name": "Штурман",
+          "color": "#ec4899"
+        },
+        {
+          "id": "alien",
+          "name": "Пришелец",
+          "color": "#84cc16"
+        }
+      ],
+      "lines": [
+        {
+          "id": "l1",
+          "characterId": "captain",
+          "startMs": 800,
+          "endMs": 3000,
+          "text": "Земля, приём! У нас гость на борту."
+        },
+        {
+          "id": "l2",
+          "characterId": "navigator",
+          "startMs": 3400,
+          "endMs": 5400,
+          "text": "Капитан, он съел карту."
+        },
+        {
+          "id": "l3",
+          "characterId": "alien",
+          "startMs": 5900,
+          "endMs": 7900,
+          "text": "Было вкусно. Есть ещё?"
+        },
+        {
+          "id": "l4",
+          "characterId": "captain",
+          "startMs": 8400,
+          "endMs": 10400,
+          "text": "Это была единственная карта!"
+        },
+        {
+          "id": "l5",
+          "characterId": "alien",
+          "startMs": 10900,
+          "endMs": 13000,
+          "text": "Не волнуйтесь, я знаю дорогу."
+        },
+        {
+          "id": "l6",
+          "characterId": "navigator",
+          "startMs": 13400,
+          "endMs": 15200,
+          "text": "Он показывает на холодильник."
+        }
+      ],
+      "attribution": "Сгенерировано для DubParty, CC0"
+    }
+  ]
+}

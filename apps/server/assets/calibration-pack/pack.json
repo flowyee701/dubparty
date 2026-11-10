@@ -1,0 +1,63 @@
+{
+  "formatVersion": 1,
+  "id": "calibration",
+  "title": "Калибровка",
+  "description": "Служебный клип со щелчками для проверки синхронизации.",
+  "author": "DubParty",
+  "language": "ru",
+  "license": "CC0-1.0",
+  "clips": [
+    {
+      "id": "beeps",
+      "title": "Калибровка синхронизации",
+      "video": "clips/beeps/video.mp4",
+      "music": "clips/beeps/music.m4a",
+      "durationMs": 8000,
+      "characters": [
+        {
+          "id": "m",
+          "name": "Метроном",
+          "color": "#6366f1"
+        }
+      ],
+      "lines": [
+        {
+          "id": "l1",
+          "characterId": "m",
+          "startMs": 1000,
+          "endMs": 1400,
+          "text": "Тик"
+        },
+        {
+          "id": "l2",
+          "characterId": "m",
+          "startMs": 2000,
+          "endMs": 2400,
+          "text": "Тик"
+        },
+        {
+          "id": "l3",
+          "characterId": "m",
+          "startMs": 3500,
+          "endMs": 3900,
+          "text": "Тик"
+        },
+        {
+          "id": "l4",
+          "characterId": "m",
+          "startMs": 5000,
+          "endMs": 5400,
+          "text": "Тик"
+        },
+        {
+          "id": "l5",
+          "characterId": "m",
+          "startMs": 6500,
+          "endMs": 6900,
+          "text": "Тик"
+        }
+      ],
+      "attribution": "Сгенерировано для DubParty, CC0"
+    }
+  ]
+}

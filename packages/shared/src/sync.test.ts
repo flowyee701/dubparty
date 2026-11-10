@@ -4,6 +4,7 @@ import {
   activeLineIndex,
   correctionFor,
   estimateClock,
+  median,
   mediaTimeAt,
   positionAt,
   rawPositionAt,
@@ -67,23 +68,30 @@ describe('смещение записи', () => {
     expect(mediaTimeAt({ clockMs: 1000, mediaMs: 40 }, 900)).toBe(-60);
   });
 
-  it('запись стартовала позже видео — смещение положительное', () => {
-    expect(takeOffsetMs({ video: { clockMs: 5000, mediaMs: 0 }, recordStartClockMs: 5120 })).toBe(
-      120,
-    );
+  it('медиана', () => {
+    expect(median([])).toBeNull();
+    expect(median([5])).toBe(5);
+    expect(median([3, 1, 2])).toBe(2);
+    expect(median([4, 1, 3, 2])).toBe(2.5);
   });
 
-  it('запись стартовала раньше видео — смещение отрицательное', () => {
-    expect(takeOffsetMs({ video: { clockMs: 5000, mediaMs: 33 }, recordStartClockMs: 4900 })).toBe(
-      -67,
-    );
+  it('смещение — медиана замеров «видео минус запись»', () => {
+    // Запись стартовала на 120 мс позже видео
+    expect(takeOffsetMs({ samples: [118, 121, 120, 122, 119] })).toBe(120);
+    // Запись стартовала раньше видео
+    expect(takeOffsetMs({ samples: [-67, -66, -68] })).toBe(-67);
+  });
+
+  it('одиночные выбросы не сдвигают результат', () => {
+    expect(takeOffsetMs({ samples: [100, 101, 99, -400, 100, 900, 100] })).toBe(100);
   });
 
   it('входная задержка вычитается, мусор игнорируется', () => {
-    const video = { clockMs: 0, mediaMs: 0 };
-    expect(takeOffsetMs({ video, recordStartClockMs: 100, inputLatencyMs: 30 })).toBe(70);
-    expect(takeOffsetMs({ video, recordStartClockMs: 100, inputLatencyMs: NaN })).toBe(100);
-    expect(takeOffsetMs({ video, recordStartClockMs: 100, inputLatencyMs: -5 })).toBe(100);
+    const samples = [100, 100, 100];
+    expect(takeOffsetMs({ samples, inputLatencyMs: 30 })).toBe(70);
+    expect(takeOffsetMs({ samples, inputLatencyMs: NaN })).toBe(100);
+    expect(takeOffsetMs({ samples, inputLatencyMs: -5 })).toBe(100);
+    expect(takeOffsetMs({ samples: [] })).toBe(0);
   });
 });
 

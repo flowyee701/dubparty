@@ -3,7 +3,7 @@ import path from 'node:path';
 import fastifyCors from '@fastify/cors';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
-import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
+import Fastify, { LogController, type FastifyBaseLogger, type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
 import type { Config } from './config';
 import { openDb, type DbHandle } from './db';
@@ -50,7 +50,8 @@ export async function createApp(
     loggerInstance: logger as FastifyBaseLogger,
     trustProxy: config.TRUST_PROXY,
     bodyLimit: 1024 * 1024,
-    disableRequestLogging: true,
+    // Запросы к API и медиа не логируем: их много, а полезное пишется в обработчиках.
+    logController: new LogController({ disableRequestLogging: true }),
   });
 
   fastify.setErrorHandler((err, request, reply) => {

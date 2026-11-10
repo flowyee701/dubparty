@@ -83,18 +83,28 @@ export function mediaTimeAt(point: VideoClockPoint, clockMs: number, rate = 1): 
   return point.mediaMs + (clockMs - point.clockMs) * rate;
 }
 
+export function median(values: readonly number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = sorted.length >> 1;
+  return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+}
+
 /**
  * Смещение начала записи относительно видео: какому моменту видео соответствует
- * нулевой сэмпл записи. Звук попал в микрофон на inputLatencyMs раньше, чем дошёл
- * до рекордера, поэтому задержку входа вычитаем.
+ * нулевой сэмпл записи.
+ *
+ * samples — замеры «время видео минус время записи», снятые на протяжении всей записи.
+ * Берётся медиана: одиночные выбросы (запоздавший кадр, короткая подгрузка) её не сдвигают.
+ * Звук попал в микрофон на inputLatencyMs раньше, чем дошёл до рекордера, поэтому задержку
+ * входа вычитаем.
  */
 export function takeOffsetMs(input: {
-  video: VideoClockPoint;
-  recordStartClockMs: number;
+  samples: readonly number[];
   inputLatencyMs?: number;
 }): number {
   const latency = Number.isFinite(input.inputLatencyMs) ? Math.max(0, input.inputLatencyMs!) : 0;
-  return Math.round(mediaTimeAt(input.video, input.recordStartClockMs) - latency);
+  return Math.round((median(input.samples) ?? 0) - latency);
 }
 
 /** Индекс реплики, звучащей в момент tMs, либо -1. */

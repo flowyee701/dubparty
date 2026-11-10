@@ -2,8 +2,11 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Toasts } from '../components/Layout';
 import { HomePage } from '../pages/HomePage';
+import { HowToPlayPage } from '../pages/HowToPlayPage';
+import { MicCheckPage } from '../pages/MicCheckPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { RoomPage } from '../pages/RoomPage';
+import { SoloPage } from '../pages/SoloPage';
 import { applyTheme, usePrefs } from '../store/prefs';
 
 export function App() {
@@ -23,6 +26,9 @@ export function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/r/:code" element={<RoomPage />} />
+        <Route path="/how" element={<HowToPlayPage />} />
+        <Route path="/mic" element={<MicCheckPage />} />
+        <Route path="/solo" element={<SoloPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toasts />

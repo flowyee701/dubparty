@@ -87,7 +87,7 @@ export function buildTakeGraph({ offsetMs, effect, durationMs, windows }: TakeGr
     `apad=whole_dur=${duration}`,
     `atrim=end=${duration}`,
     'asetpts=PTS-STARTPTS',
-    'alimiter=limit=0.95',
+    'alimiter=limit=0.95:latency=1',
     `aresample=${SAMPLE_RATE}`,
   );
 
@@ -127,7 +127,7 @@ export function buildReviewGraph(
     parts.push('[voice]anull[mix]');
   }
   parts.push(
-    `[mix]apad=whole_dur=${duration},atrim=end=${duration},alimiter=limit=0.95,aresample=${SAMPLE_RATE}[a]`,
+    `[mix]apad=whole_dur=${duration},atrim=end=${duration},alimiter=limit=0.95:latency=1,aresample=${SAMPLE_RATE}[a]`,
   );
   return parts.join(';');
 }

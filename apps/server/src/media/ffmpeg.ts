@@ -123,11 +123,12 @@ export function probe(file: string): Promise<ProbeResult> {
         (s) => s.codec_type === 'video' && s.disposition?.attached_pic !== 1,
       );
       const audio = data.streams.find((s) => s.codec_type === 'audio');
-      const durations = [data.format.duration, video?.duration, audio?.duration]
+      // Длительность берём по видеодорожке: звук из-за заполнения кодека бывает чуть длиннее.
+      const duration = [video?.duration, data.format.duration, audio?.duration]
         .map((d) => Number(d))
-        .filter((d) => Number.isFinite(d) && d > 0);
+        .find((d) => Number.isFinite(d) && d > 0);
       resolve({
-        durationMs: durations.length > 0 ? Math.round(Math.max(...durations) * 1000) : 0,
+        durationMs: duration ? Math.round(duration * 1000) : 0,
         hasVideo: !!video,
         hasAudio: !!audio,
         width: video?.width ?? 0,
