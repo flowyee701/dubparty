@@ -27,6 +27,7 @@ import {
   Modal,
   Notice,
   Select,
+  TextInput,
   Toggle,
 } from '../components/ui';
 import { useErrorText } from '../lib/hooks';
@@ -311,6 +312,88 @@ function SettingsPanel({ state }: { state: RoomState }) {
   );
 }
 
+/** Режим стримера: зрители Twitch голосуют командами в чате. */
+function TwitchPanel({ state }: { state: RoomState }) {
+  const { t } = useTranslation();
+  const errorText = useErrorText();
+  const inputId = useId();
+  const [channel, setChannel] = useState(state.twitch.channel ?? '');
+  const [busy, setBusy] = useState(false);
+  const { twitch } = state;
+  const isHost = state.hostId === state.youId;
+  if (!twitch.enabled || (!isHost && twitch.status === 'off')) return null;
+
+  const run = (action: () => Promise<unknown>) => {
+    setBusy(true);
+    action()
+      .catch((err) => toast.error(errorText(err)))
+      .finally(() => setBusy(false));
+  };
+  const tone = {
+    off: 'neutral',
+    connecting: 'warn',
+    connected: 'success',
+    error: 'danger',
+  } as const;
+
+  return (
+    <Card as="section" aria-labelledby="twitch-title" className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="twitch-title" className="text-xl font-bold">
+          <span aria-hidden="true">📺</span> {t('twitch.title')}
+        </h2>
+        <span role="status">
+          <Badge tone={tone[twitch.status]}>
+            {t(`twitch.status.${twitch.status}`, { channel: twitch.channel ?? '' })}
+          </Badge>
+        </span>
+      </div>
+      <p className="text-sm text-pretty text-muted">{t('twitch.text')}</p>
+      {isHost &&
+        (twitch.status === 'connected' || twitch.status === 'connecting' ? (
+          <Button
+            className="self-start"
+            loading={busy}
+            onClick={() => run(() => request('twitch:disconnect'))}
+          >
+            {t('twitch.disconnect')}
+          </Button>
+        ) : (
+          <form
+            className="flex flex-wrap items-end gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (channel.trim()) run(() => request('twitch:connect', { channel }));
+            }}
+          >
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <label htmlFor={inputId} className="text-sm font-medium">
+                {t('twitch.channel')}
+              </label>
+              <TextInput
+                id={inputId}
+                value={channel}
+                onChange={(e) => setChannel(e.target.value)}
+                placeholder="my_channel"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+              />
+            </div>
+            <Button type="submit" variant="primary" loading={busy} disabled={!channel.trim()}>
+              {t('twitch.connect')}
+            </Button>
+          </form>
+        ))}
+      {twitch.status === 'error' && (
+        <Notice tone="danger" role="alert">
+          {t('twitch.error')}
+        </Notice>
+      )}
+    </Card>
+  );
+}
+
 function EditProfileModal({
   open,
   onClose,
@@ -400,6 +483,8 @@ export function Lobby({ state, footer }: { state: RoomState; footer?: React.Reac
 
         <SettingsPanel state={state} />
       </div>
+
+      <TwitchPanel state={state} />
 
       {footer}
 

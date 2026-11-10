@@ -1,4 +1,18 @@
 export const lobby = {
+  twitch: {
+    title: 'Streamer mode',
+    text: 'Connect a Twitch chat — during voting viewers type !1, !2, !3… to pick their favourite. It is a separate “Audience choice” category. The chat is read anonymously: no sign-in needed.',
+    channel: 'Twitch channel name',
+    connect: 'Connect chat',
+    disconnect: 'Disconnect chat',
+    status: {
+      off: 'chat not connected',
+      connecting: 'connecting to {{channel}}…',
+      connected: 'chat {{channel}} connected',
+      error: 'could not connect',
+    },
+    error: 'Could not connect to the chat. Check the channel name and try again.',
+  },
   lobby: {
     roomCode: 'Room code',
     codeHidden: 'Code is hidden',
