@@ -126,3 +126,56 @@ export function Subtitles({
     </ol>
   );
 }
+
+/**
+ * Текущая реплика поверх видео — как строка караоке. На телефоне список реплик уезжает
+ * под клип, а эта строка всегда перед глазами.
+ */
+export function LineOverlay({
+  video,
+  lines,
+  characters,
+  mine,
+}: {
+  video: RefObject<HTMLVideoElement | null>;
+  lines: readonly ClipLine[];
+  characters: readonly ClipCharacter[];
+  mine: readonly string[] | null;
+}) {
+  const { t } = useTranslation();
+  const { active, upcoming } = useLineCursor(video, lines);
+  const index = active >= 0 ? active : upcoming;
+  const line = lines[index];
+  if (!line) return null;
+  const character = characters.find((c) => c.id === line.characterId);
+  const isMine = !mine || mine.includes(line.characterId);
+  const isActive = index === active;
+  return (
+    // Дублирует список реплик, поэтому от скринридеров скрыта.
+    <div
+      aria-hidden="true"
+      className={cx(
+        'pointer-events-none absolute inset-x-2 bottom-4 rounded-xl px-3 py-2 text-center text-white transition-opacity',
+        isActive ? 'bg-black/75' : 'bg-black/50',
+        !isMine && 'opacity-60',
+      )}
+    >
+      <p className="flex items-center justify-center gap-1.5 text-xs font-bold">
+        <span
+          className="size-2.5 rounded-full"
+          style={{ backgroundColor: character?.color ?? '#888' }}
+        />
+        {character?.name}
+        {!isActive && <span className="ml-2 text-amber-300">· {t('studio.getReady')}</span>}
+      </p>
+      <p
+        className={cx(
+          'text-pretty',
+          isActive ? 'text-base font-bold sm:text-lg' : 'text-sm opacity-80',
+        )}
+      >
+        {line.text}
+      </p>
+    </div>
+  );
+}

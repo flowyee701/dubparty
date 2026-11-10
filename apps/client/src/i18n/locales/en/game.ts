@@ -39,6 +39,7 @@ export const game = {
     pause: 'Pause',
     toVoting: 'To voting',
     skipToVoting: 'Skip to voting',
+    leaveShort: 'Leave',
     leaveTitle: 'Leave the game?',
     leaveText: 'The game will go on without you, and you will not be able to come back.',
     codeLabel: 'Room',

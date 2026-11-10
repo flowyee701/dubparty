@@ -8,7 +8,7 @@ import { formatClock, useErrorText, useLatest, useRemainingMs } from '../lib/hoo
 import { toast } from '../store/toasts';
 import { EffectPicker } from './EffectPicker';
 import { MicSetup, useMic } from './MicSetup';
-import { Subtitles } from './Subtitles';
+import { LineOverlay, Subtitles } from './Subtitles';
 import { Badge, Button, cx, Notice } from './ui';
 
 type Phase = 'idle' | 'countdown' | 'recording' | 'review';
@@ -242,8 +242,9 @@ export function Studio({
   const hasServerTake = serverStatus === 'ready';
 
   return (
+    // На телефоне порядок: клип с кнопками → реплики → микрофон; на широком экране реплики справа.
     <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
-      <div className="flex min-w-0 flex-col gap-3">
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-1 lg:row-start-1">
         <div className="relative aspect-video overflow-hidden rounded-3xl bg-black shadow-lg">
           <video
             ref={video}
@@ -290,6 +291,14 @@ export function Studio({
             >
               ⏱ {formatClock(remaining)}
             </div>
+          )}
+          {(phase === 'recording' || previewing) && (
+            <LineOverlay
+              video={video}
+              lines={clip.lines}
+              characters={clip.characters}
+              mine={mine}
+            />
           )}
           <VideoProgress video={video} />
         </div>
@@ -371,11 +380,6 @@ export function Studio({
             }}
           />
         )}
-
-        <div className="rounded-2xl border border-border bg-surface p-3">
-          <MicSetup mic={mic} compact />
-        </div>
-        {clip.hasMusic && !mic.error && <Notice tone="info">{t('studio.headphones')}</Notice>}
       </div>
 
       <Subtitles
@@ -383,8 +387,15 @@ export function Studio({
         lines={clip.lines}
         characters={clip.characters}
         mine={mine}
-        className="max-h-[42dvh] lg:max-h-[70dvh]"
+        className="max-h-[38dvh] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[70dvh]"
       />
+
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-1 lg:row-start-2">
+        <div className="rounded-2xl border border-border bg-surface p-3">
+          <MicSetup mic={mic} compact />
+        </div>
+        {clip.hasMusic && !mic.error && <Notice tone="info">{t('studio.headphones')}</Notice>}
+      </div>
     </div>
   );
 }

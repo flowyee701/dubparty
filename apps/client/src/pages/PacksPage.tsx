@@ -159,6 +159,8 @@ export function PacksPage() {
               accept=".zip,application/zip"
               className="sr-only"
               id="pack-import"
+              aria-label={t('packs.import')}
+              tabIndex={-1}
               onChange={(e) => void onImport(e.target.files?.[0])}
             />
             {importProgress === null ? (

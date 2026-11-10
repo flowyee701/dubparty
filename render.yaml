@@ -1,0 +1,18 @@
+# Blueprint для Render — см. README, раздел «Деплой».
+services:
+  - type: web
+    name: dubparty
+    runtime: docker
+    plan: starter
+    # Комнаты живут в памяти процесса — экземпляр должен быть один.
+    numInstances: 1
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: '3001'
+      - key: TRUST_PROXY
+        value: 'true'
+    disk:
+      name: dubparty-data
+      mountPath: /data
+      sizeGB: 5

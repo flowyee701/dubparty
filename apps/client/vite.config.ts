@@ -12,6 +12,11 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: true,
     port: 5173,
+    // Dev-сервер доступен через Cloudflare Tunnel; свои домены — через DUBPARTY_ALLOWED_HOSTS.
+    allowedHosts: [
+      '.trycloudflare.com',
+      ...(process.env.DUBPARTY_ALLOWED_HOSTS?.split(',').map((h) => h.trim()) ?? []),
+    ],
     proxy: {
       '/api': { target: SERVER, changeOrigin: true },
       '/socket.io': { target: SERVER, changeOrigin: true, ws: true },

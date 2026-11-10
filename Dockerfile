@@ -45,14 +45,17 @@ COPY --from=build /app/apps/server/dist ./dist
 COPY --from=build /app/apps/server/assets ./assets
 COPY --from=build /app/apps/client/dist ./client
 COPY --from=build /app/apps/server/package.json ./package.json
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN mkdir -p /data/db /data/storage && chown -R node:node /data /app
-USER node
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+ && mkdir -p /data/db /data/storage \
+ && chown -R node:node /data /app
 VOLUME ["/data"]
 EXPOSE 3001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3001)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+# Точка входа стартует от root только чтобы выдать права на том, затем переходит на пользователя node.
+ENTRYPOINT ["/usr/bin/tini", "--", "docker-entrypoint.sh"]
 CMD ["node", "dist/index.js"]

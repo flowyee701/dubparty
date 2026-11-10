@@ -21,9 +21,11 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "demo:generate": "pnpm --filter @dubparty/server demo:generate",
+    "screenshots": "node scripts/screenshots.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
     "@types/node": "^24.19.2",

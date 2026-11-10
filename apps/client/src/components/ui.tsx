@@ -380,3 +380,16 @@ export function ProgressBar({ value, label }: { value: number; label: string }) 
     </div>
   );
 }
+
+/** Чёрный или белый текст — какой лучше читается на данном фоне (по относительной яркости WCAG). */
+export function readableOn(hex: string): '#000000' | '#ffffff' {
+  const n = parseInt(hex.replace('#', ''), 16);
+  if (!Number.isFinite(n)) return '#ffffff';
+  const channel = (shift: number) => {
+    const v = ((n >> shift) & 0xff) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance = 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0);
+  // Контраст с чёрным выше, чем с белым, когда яркость фона больше ~0.179.
+  return luminance > 0.179 ? '#000000' : '#ffffff';
+}

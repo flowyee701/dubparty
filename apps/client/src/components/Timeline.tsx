@@ -1,7 +1,7 @@
 import type { ClipCharacter, ClipLine } from '@dubparty/shared';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cx } from './ui';
+import { cx, readableOn } from './ui';
 
 const LANE_PX = 30;
 const MIN_LINE_MS = 200;
@@ -159,7 +159,7 @@ export function Timeline({
                 onPointerUp={end}
                 onPointerCancel={end}
                 className={cx(
-                  'absolute flex items-center overflow-hidden rounded-md text-[11px] font-semibold text-white',
+                  'absolute flex items-center overflow-hidden rounded-md text-[11px] font-semibold',
                   readOnly ? 'cursor-default' : 'cursor-grab touch-none active:cursor-grabbing',
                   selected && 'z-10 ring-2 ring-text',
                 )}
@@ -169,6 +169,7 @@ export function Timeline({
                   left: pct(line.startMs),
                   width: `${((line.endMs - line.startMs) / durationMs) * 100}%`,
                   backgroundColor: color,
+                  color: readableOn(color),
                 }}
               >
                 {!readOnly && (
@@ -179,7 +180,7 @@ export function Timeline({
                     className="absolute inset-y-0 left-0 w-2 cursor-ew-resize bg-black/30"
                   />
                 )}
-                <span className="pointer-events-none truncate px-2.5 drop-shadow">{line.text}</span>
+                <span className="pointer-events-none truncate px-2.5">{line.text}</span>
                 {!readOnly && (
                   <span
                     onPointerDown={(e) => begin(e, line, 'end')}

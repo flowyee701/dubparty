@@ -42,11 +42,17 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.audioWorklet } },
   },
   {
-    files: ['apps/server/**/*.ts', 'e2e/**/*.ts', '*.config.{js,ts}', 'apps/*/*.config.{js,ts}'],
+    files: [
+      'apps/server/**/*.ts',
+      'e2e/**/*.ts',
+      'scripts/**/*.mjs',
+      '*.config.{js,ts}',
+      'apps/*/*.config.{js,ts}',
+    ],
     languageOptions: { globals: globals.node },
   },
   {
-    files: ['apps/server/scripts/**/*.ts', 'e2e/**/*.ts'],
+    files: ['apps/server/scripts/**/*.ts', 'e2e/**/*.ts', 'scripts/**/*.mjs'],
     rules: { 'no-console': 'off' },
   },
 );

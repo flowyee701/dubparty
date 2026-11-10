@@ -165,7 +165,7 @@ function GameBar({ state, onLeave }: { state: RoomState; onLeave(): void }) {
   const [confirm, setConfirm] = useState(false);
   return (
     <div className="mb-3 flex items-center justify-between gap-3 text-sm">
-      <p className="font-semibold text-muted">
+      <p className="font-semibold whitespace-nowrap text-muted">
         {t('game.codeLabel')}{' '}
         <span className="font-mono font-black tracking-widest text-text">
           {state.settings.hideCode ? '••••' : state.code}
@@ -175,8 +175,13 @@ function GameBar({ state, onLeave }: { state: RoomState; onLeave(): void }) {
         </span>
         {t('game.roundOf', { n: state.roundIndex + 1, total: state.totalRounds })}
       </p>
-      <Button size="sm" variant="ghost" onClick={() => setConfirm(true)}>
-        {t('room.leave')}
+      <Button
+        size="sm"
+        variant="ghost"
+        className="whitespace-nowrap"
+        onClick={() => setConfirm(true)}
+      >
+        {t('game.leaveShort')}
       </Button>
       <Modal
         open={confirm}
@@ -222,9 +227,10 @@ function RoomView({ state }: { state: RoomState }) {
           <Lobby
             state={state}
             footer={
-              <div className="flex flex-col items-center gap-3">
+              // Кнопка старта всегда на виду, даже когда настройки не помещаются на экран.
+              <div className="sticky bottom-3 z-10 flex flex-col items-center gap-2 rounded-3xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">
                 <StartBar state={state} />
-                <Button variant="ghost" onClick={onLeave}>
+                <Button size="sm" variant="ghost" onClick={onLeave}>
                   {t('room.leave')}
                 </Button>
               </div>

@@ -35,12 +35,7 @@ export function Recording({ state, round }: { state: RoomState; round: RoundStat
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-3 !p-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h1 className="text-xl font-black">
-            {round.clip.title}
-            <span className="ml-2 text-sm font-semibold text-muted">
-              {t('game.roundOf', { n: round.index + 1, total: state.totalRounds })}
-            </span>
-          </h1>
+          <h1 className="text-xl font-black">{round.clip.title}</h1>
           {names && names.length > 0 && (
             <p className="font-bold text-accent">
               {t('game.youPlay', { names: names.join(', ') })}

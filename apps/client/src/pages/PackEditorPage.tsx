@@ -631,6 +631,8 @@ function AddClip({
       <input
         ref={input}
         id="clip-file"
+        aria-label={t('editor.chooseVideo')}
+        tabIndex={-1}
         type="file"
         accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v"
         className="sr-only"

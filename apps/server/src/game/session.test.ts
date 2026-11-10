@@ -510,3 +510,20 @@ describe('игроки уходят во время игры', () => {
     expect(t.room.phase).toBe('recording');
   });
 });
+
+describe('лимиты', () => {
+  it('число файлов на комнату ограничено', async () => {
+    const { t, host } = setup(2);
+    await toRecording(t, host.id);
+    t.room.deps.limits.maxRoomFiles = 2;
+    await t.submit(host.id); // сырой дубль + обработанный голос = 2 файла
+    expect(() => t.session().prepareTake(host.id, 0, 'webm')).toThrowError(/storage limit/);
+  });
+
+  it('число перезаписей дубля за раунд ограничено', async () => {
+    const { t, host } = setup(2);
+    await toRecording(t, host.id);
+    for (let i = 0; i < 30; i++) await t.submit(host.id);
+    expect(() => t.session().prepareTake(host.id, 0, 'webm')).toThrowError(/Too many takes/);
+  });
+});

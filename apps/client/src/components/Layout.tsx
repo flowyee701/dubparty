@@ -71,7 +71,8 @@ export function Header({ compact = false }: { compact?: boolean }) {
         <button
           type="button"
           onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
-          aria-label={t('common.switchLang')}
+          // Доступное имя включает видимый текст кнопки — так её можно вызвать голосом.
+          aria-label={`${lang === 'ru' ? 'EN' : 'RU'} — ${t('common.switchLang')}`}
           title={t('common.switchLang')}
           className="h-10 rounded-full px-3 text-sm font-bold uppercase hover:bg-surface-2"
         >
