@@ -1,0 +1,9 @@
+node_modules
+dist
+storage
+data
+pnpm-lock.yaml
+playwright-report
+test-results
+apps/server/assets
+*.md

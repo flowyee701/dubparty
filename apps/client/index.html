@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#100d1a" />
+    <meta
+      name="description"
+      content="DubParty — пати-игра: переозвучивайте клипы своим голосом вместе с друзьями"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>DubParty</title>
+    <script>
+      // Тему выставляем до первой отрисовки, чтобы не было вспышки.
+      (function () {
+        try {
+          var saved = JSON.parse(localStorage.getItem('dubparty:prefs') || '{}');
+          var theme = saved && saved.state ? saved.state.theme : 'system';
+          var dark =
+            theme === 'dark' ||
+            (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

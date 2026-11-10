@@ -1,0 +1,192 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f5f3fb;
+  --surface: #ffffff;
+  --surface-2: #ece8f8;
+  --border: #d5cfe8;
+  --text: #17131f;
+  --muted: #57516b;
+  --accent: #6234e8;
+  --accent-hover: #5127cf;
+  --accent-fg: #ffffff;
+  --accent-soft: #e9e1ff;
+  --danger: #c2183a;
+  --danger-soft: #fde4e9;
+  --success: #117a45;
+  --success-soft: #dcf5e7;
+  --warn: #8a4d00;
+  --warn-soft: #fff0d1;
+  --ring: #6234e8;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0f0c18;
+  --surface: #19152a;
+  --surface-2: #231d38;
+  --border: #372f52;
+  --text: #f4f1fc;
+  --muted: #aaa3c4;
+  --accent: #a48bff;
+  --accent-hover: #b9a5ff;
+  --accent-fg: #120e1e;
+  --accent-soft: #2b2250;
+  --danger: #ff7088;
+  --danger-soft: #3d1420;
+  --success: #4ade80;
+  --success-soft: #11321f;
+  --warn: #fbbf24;
+  --warn-soft: #3a2a08;
+  --ring: #c4b5fd;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  --animate-rise: rise 0.4s ease-out both;
+  --animate-fade: fade 0.3s ease-out both;
+  --animate-count: count 0.9s ease-out both;
+  --animate-pulse-ring: pulse-ring 1.2s ease-out infinite;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes count {
+  0% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(
+      60rem 30rem at 85% -10%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      40rem 26rem at -10% 10%,
+      color-mix(in srgb, #ec4899 10%, transparent),
+      transparent
+    ),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Видимый фокус для клавиатуры на любых интерактивных элементах */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+button,
+[role='button'],
+select,
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+input[type='range'] {
+  accent-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

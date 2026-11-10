@@ -1,0 +1,30 @@
+services:
+  dubparty:
+    build: .
+    image: dubparty:latest
+    restart: unless-stopped
+    ports:
+      - '${PORT:-3001}:3001'
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3001}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      ROOM_TTL_HOURS: ${ROOM_TTL_HOURS:-6}
+      ROOM_IDLE_HOURS: ${ROOM_IDLE_HOURS:-12}
+      FFMPEG_CONCURRENCY: ${FFMPEG_CONCURRENCY:-2}
+      TWITCH_ENABLED: ${TWITCH_ENABLED:-true}
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_FORCE_PATH_STYLE: ${S3_FORCE_PATH_STYLE:-true}
+      S3_PREFIX: ${S3_PREFIX:-}
+    volumes:
+      - dubparty-data:/data
+    stop_grace_period: 15s
+
+volumes:
+  dubparty-data:

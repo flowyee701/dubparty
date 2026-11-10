@@ -1,0 +1,46 @@
+{
+  "name": "dubparty",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DubParty — браузерная пати-игра: переозвучивайте клипы своим голосом",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c blue,magenta \"pnpm --filter @dubparty/server dev\" \"pnpm --filter @dubparty/client dev\"",
+    "dev:https": "concurrently -k -n server,client -c blue,magenta \"pnpm --filter @dubparty/server dev\" \"pnpm --filter @dubparty/client dev:https\"",
+    "build": "pnpm --filter @dubparty/client build && pnpm --filter @dubparty/server build",
+    "start": "pnpm --filter @dubparty/server start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck && tsc -p e2e/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "demo:generate": "pnpm --filter @dubparty/server demo:generate",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^24.19.2",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "ffmpeg-static"
+    ]
+  }
+}
