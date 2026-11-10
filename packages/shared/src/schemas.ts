@@ -170,7 +170,8 @@ export type PackManifest = z.infer<typeof packManifestSchema>;
 
 // ── Полезные нагрузки событий ─────────────────────────────────────────────
 
-export const emptySchema = z.object({}).optional();
+/** События без данных: что бы ни прислал клиент (undefined по сети превращается в null), игнорируем. */
+export const emptySchema = z.unknown().transform((): null => null);
 
 export const roomCreateSchema = profileSchema;
 export const roomJoinSchema = profileSchema.extend({ roomCode: roomCodeSchema });

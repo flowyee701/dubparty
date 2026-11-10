@@ -13,6 +13,8 @@ export const packs = sqliteTable('packs', {
   hidden: integer('hidden', { mode: 'boolean' }).notNull().default(false),
   /** SHA-256 токена владельца. У встроенных паков — null: их нельзя редактировать. */
   ownerTokenHash: text('owner_token_hash'),
+  /** Хэш pack.json встроенного пака: по нему понятно, нужно ли пересеивать. */
+  seedHash: text('seed_hash'),
   createdAt: integer('created_at').notNull(),
   updatedAt: integer('updated_at').notNull(),
 });
@@ -31,8 +33,6 @@ export const clips = sqliteTable(
     posterKey: text('poster_key').notNull(),
     /** Нормализованный исходник до обрезки — нужен редактору. */
     sourceKey: text('source_key').notNull(),
-    /** Отдельная музыкальная дорожка (для экспорта пака). */
-    musicKey: text('music_key'),
     hasMusic: integer('has_music', { mode: 'boolean' }).notNull().default(false),
     durationMs: integer('duration_ms').notNull(),
     sourceDurationMs: integer('source_duration_ms').notNull(),

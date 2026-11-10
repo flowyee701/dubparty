@@ -22,6 +22,7 @@ const MIGRATIONS: string[] = [
     builtin INTEGER NOT NULL DEFAULT 0,
     hidden INTEGER NOT NULL DEFAULT 0,
     owner_token_hash TEXT,
+    seed_hash TEXT,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
   );
@@ -33,7 +34,6 @@ const MIGRATIONS: string[] = [
     video_key TEXT NOT NULL,
     poster_key TEXT NOT NULL,
     source_key TEXT NOT NULL,
-    music_key TEXT,
     has_music INTEGER NOT NULL DEFAULT 0,
     duration_ms INTEGER NOT NULL,
     source_duration_ms INTEGER NOT NULL,

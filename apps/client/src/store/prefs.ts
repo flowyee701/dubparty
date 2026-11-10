@@ -1,4 +1,4 @@
-import { AVATARS, PLAYER_COLORS, type Avatar } from '@dubparty/shared';
+import { AVATARS, PLAYER_COLORS, type Avatar, type PlayerColor } from '@dubparty/shared';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -11,7 +11,7 @@ export interface PrefsState {
   sfx: boolean;
   nickname: string;
   avatar: Avatar;
-  color: string;
+  color: PlayerColor;
   /** Игрок уже видел «Как играть» и проверил микрофон. */
   onboarded: boolean;
   micDeviceId: string | null;

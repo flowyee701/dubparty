@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Toasts } from '../components/Layout';
 import { HomePage } from '../pages/HomePage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { RoomPage } from '../pages/RoomPage';
 import { applyTheme, usePrefs } from '../store/prefs';
 
 export function App() {
@@ -21,6 +22,7 @@ export function App() {
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/r/:code" element={<RoomPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toasts />

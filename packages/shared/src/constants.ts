@@ -33,6 +33,8 @@ export const PLAYER_COLORS = [
   '#ec4899',
 ] as const;
 
+export type PlayerColor = (typeof PLAYER_COLORS)[number];
+
 export const MODES = ['parallel', 'roles', 'free'] as const;
 export type GameMode = (typeof MODES)[number];
 
