@@ -6,13 +6,12 @@ import type { Server } from 'socket.io';
 import type { AppPlugin } from './app';
 import { GameController } from './game/controller';
 import { RoomManager } from './game/manager';
-import type { MediaPipeline, TwitchVoteSource } from './game/types';
+import type { MediaPipeline } from './game/types';
 import { registerRoutes } from './http/routes';
 import { configureFfmpeg, resolveFfmpegPaths } from './media/ffmpeg';
 import { createMediaPipeline, createMediaTools, type MediaTools } from './media/pipeline';
 import { PackService } from './packs/service';
 import { attachSockets } from './sockets';
-import { TmiVoteSource } from './twitch/source';
 
 export interface Services {
   manager: RoomManager;
@@ -25,7 +24,6 @@ export interface Services {
 export interface GamePluginOptions {
   /** Подмена конвейера обработки (в тестах — чтобы не запускать ffmpeg). */
   media?: MediaPipeline;
-  createTwitch?: () => TwitchVoteSource;
   timings?: Partial<Timings>;
   /** Засевать встроенные паки из каталога assets. */
   seed?: boolean;
@@ -76,7 +74,6 @@ export function createGamePlugin(options: GamePluginOptions = {}): AppPlugin {
     const manager = new RoomManager(ctx, {
       packs,
       media: options.media ?? createMediaPipeline(storage, tools),
-      createTwitch: options.createTwitch ?? (() => new TmiVoteSource()),
       timings: { ...parseTimings(config.DUBPARTY_TIMINGS), ...options.timings },
     });
     await manager.start();

@@ -49,7 +49,6 @@ export const game = {
     categories: {
       funniest: 'Funniest',
       acting: 'Best acting',
-      audience: 'Audience choice',
     },
     you: 'that’s you',
     voted: 'has voted',
@@ -58,10 +57,6 @@ export const game = {
     rewatchOf: 'Watch again: {{names}}',
     noTargets: 'There is nobody for you to vote for this round — waiting for the others.',
     doneHint: 'Vote received. You can change it until the timer runs out.',
-    twitchTitle: 'Viewers are voting in chat',
-    twitchHint: 'Commands: !1 to !{{max}}.',
-    audienceVotes_one: '{{count}} vote so far.',
-    audienceVotes_other: '{{count}} votes so far.',
   },
   results: {
     title: 'Round results',

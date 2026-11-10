@@ -1,4 +1,10 @@
 export const studio = {
+  onboarding: {
+    howTitle: 'How to play',
+    micTitle: 'Let’s check your microphone',
+    skip: 'Skip',
+    toMic: 'Next: microphone',
+  },
   studio: {
     clip: 'Clip “{{title}}”',
     lines: 'Lines',

@@ -30,7 +30,6 @@ describe('сокеты и HTTP вместе', () => {
   let dir: string;
   let url: string;
   const clients: Client[] = [];
-  let twitchVote: ((user: string, choice: number) => void) | null = null;
 
   beforeAll(async () => {
     dir = mkdtempSync(path.join(os.tmpdir(), 'dubparty-sock-'));
@@ -45,15 +44,6 @@ describe('сокеты и HTTP вместе', () => {
       createGamePlugin({
         seed: false,
         media: { processTake: async () => {}, buildReview: async () => {} },
-        createTwitch: () => ({
-          connect: async (channel, onVote) => {
-            if (channel === 'broken_channel') throw new Error('no such channel');
-            twitchVote = onVote;
-          },
-          disconnect: async () => {
-            twitchVote = null;
-          },
-        }),
         timings: { introMs: 30, lobbyDisconnectMs: 60_000, hostGraceMs: 60_000 },
         onReady: (s) => (services = s),
       }),
@@ -307,39 +297,6 @@ describe('сокеты и HTTP вместе', () => {
       ok: false,
       error: { code: 'FORBIDDEN' },
     });
-  });
-
-  it('Twitch: чат подключает только хост, состояние видно всем, ошибка не роняет комнату', async () => {
-    const host = await client();
-    const guest = await client();
-    const created = await ok(host, 'room:create', profile('Хост'));
-    await ok(guest, 'room:join', { ...profile('Гость'), roomCode: created.roomCode });
-
-    expect(await call(guest, 'twitch:connect', { channel: 'somechannel' })).toMatchObject({
-      ok: false,
-      error: { code: 'FORBIDDEN' },
-    });
-    expect(await call(host, 'twitch:connect', { channel: 'bad channel!' })).toMatchObject({
-      ok: false,
-      error: { code: 'VALIDATION' },
-    });
-
-    const connected = nextState(guest, (s) => s.twitch.status === 'connected');
-    await ok(host, 'twitch:connect', { channel: 'https://twitch.tv/SomeChannel' });
-    expect((await connected).twitch).toEqual({
-      enabled: true,
-      channel: 'somechannel',
-      status: 'connected',
-    });
-    expect(twitchVote).not.toBeNull();
-
-    const failed = nextState(guest, (s) => s.twitch.status === 'error');
-    await ok(host, 'twitch:connect', { channel: 'broken_channel' });
-    expect((await failed).twitch.channel).toBe('broken_channel');
-
-    const off = nextState(guest, (s) => s.twitch.status === 'off');
-    await ok(host, 'twitch:disconnect', undefined);
-    expect((await off).twitch.channel).toBeNull();
   });
 
   it('медиа отдаётся с поддержкой Range, закрытые файлы недоступны', async () => {

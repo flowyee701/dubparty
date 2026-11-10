@@ -195,20 +195,6 @@ export const playbackControlSchema = z.discriminatedUnion('action', [
 ]);
 export type PlaybackControl = z.infer<typeof playbackControlSchema>;
 export const voteCastSchema = z.object({ category: voteCategorySchema, targetId: idSchema });
-export const twitchConnectSchema = z.object({
-  channel: z
-    .string()
-    .max(80)
-    .transform((s) =>
-      s
-        .trim()
-        .toLowerCase()
-        .replace(/^https?:\/\/(www\.)?twitch\.tv\//, '')
-        .replace(/^[#@]/, '')
-        .replace(/\/.*$/, ''),
-    )
-    .pipe(z.string().regex(new RegExp(`^[a-z0-9_]{3,${LIMITS.twitchChannelMax}}$`))),
-});
 export const timeSyncSchema = z.object({ clientTime: z.number() });
 
 /** Параметры загрузки дубля (query-строка запроса). */

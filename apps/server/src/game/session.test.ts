@@ -137,7 +137,7 @@ describe('раунд Parallel: полный цикл', () => {
     expect(t.room.phase).toBe('results');
 
     const results = t.room.snapshotFor(a).round!.results!;
-    expect(results.tallies[targetOf(b)]).toEqual({ funniest: 2, acting: 2, audience: 0 });
+    expect(results.tallies[targetOf(b)]).toEqual({ funniest: 2, acting: 2 });
     expect(results.winners.funniest).toEqual([targetOf(b)]);
     const score = (id: string) => t.room.getPlayer(id)!.score;
     expect(score(b)).toBe(4 * SCORING.perVote + 2 * SCORING.categoryWin + SCORING.votedBonus);
@@ -378,44 +378,6 @@ describe('голосование', () => {
     t.session().castVote(b, 'acting', only!.id);
     await vi.advanceTimersByTimeAsync(1000);
     expect(t.room.phase).toBe('results');
-  });
-
-  it('голоса зрителей: считается последний голос зрителя, неверные номера игнорируются', async () => {
-    const { t, players, host } = setup(2);
-    const ids = players.map((p) => p.id);
-    await t.room.connectTwitch('somechannel');
-    expect(t.room.twitch).toEqual({ enabled: true, channel: 'somechannel', status: 'connected' });
-
-    // До голосования команды из чата ничего не делают
-    t.twitch!.emit('early', 1);
-    await toVoting(t, host.id, ids);
-    const targets = t.room.snapshotFor(host.id).round!.voteTargets;
-
-    t.twitch!.emit('viewer1', 1);
-    t.twitch!.emit('viewer2', 2);
-    t.twitch!.emit('viewer3', 2);
-    t.twitch!.emit('viewer1', 2); // передумал
-    t.twitch!.emit('viewer4', 9); // нет такого варианта
-    t.twitch!.emit('viewer5', 0);
-    expect(t.room.snapshotFor(host.id).round!.audienceVotes).toBe(3);
-
-    await vi.advanceTimersByTimeAsync(TIMINGS.votingMs);
-    const results = t.room.snapshotFor(host.id).round!.results!;
-    expect(results.tallies[targets[1]!.id]!.audience).toBe(3);
-    expect(results.tallies[targets[0]!.id]!.audience).toBe(0);
-    expect(results.winners.audience).toEqual([targets[1]!.id]);
-    const winner = t.room.getPlayer(targets[1]!.authorIds[0]!)!;
-    expect(winner.score).toBe(SCORING.audienceWin);
-
-    await t.room.disconnectTwitch();
-    expect(t.twitch!.connected).toBe(false);
-    expect(t.room.twitch.status).toBe('off');
-  });
-
-  it('ошибка подключения к Twitch отражается в состоянии и не роняет комнату', async () => {
-    const { t } = setup(2, { twitchFails: true });
-    await t.room.connectTwitch('somechannel');
-    expect(t.room.twitch.status).toBe('error');
   });
 });
 

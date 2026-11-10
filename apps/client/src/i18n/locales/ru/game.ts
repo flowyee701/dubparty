@@ -51,7 +51,6 @@ export const game = {
     categories: {
       funniest: 'Самый смешной',
       acting: 'Лучшая актёрская игра',
-      audience: 'Выбор зрителей',
     },
     you: 'это вы',
     voted: 'проголосовал',
@@ -60,12 +59,6 @@ export const game = {
     rewatchOf: 'Пересмотреть: {{names}}',
     noTargets: 'В этом раунде вам не за кого голосовать — ждём остальных.',
     doneHint: 'Голос принят. До конца таймера выбор можно изменить.',
-    twitchTitle: 'Зрители голосуют в чате',
-    twitchHint: 'Команды: от !1 до !{{max}}.',
-    audienceVotes_one: 'Уже {{count}} голос.',
-    audienceVotes_few: 'Уже {{count}} голоса.',
-    audienceVotes_many: 'Уже {{count}} голосов.',
-    audienceVotes_other: 'Уже {{count}} голоса.',
   },
   results: {
     title: 'Итоги раунда',

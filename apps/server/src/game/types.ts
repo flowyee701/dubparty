@@ -61,20 +61,12 @@ export interface MediaPipeline {
   }): Promise<void>;
 }
 
-export interface TwitchVoteSource {
-  /** Начинает слушать чат; onVote получает имя зрителя и номер варианта (с 1). */
-  connect(channel: string, onVote: (user: string, choice: number) => void): Promise<void>;
-  disconnect(): Promise<void>;
-}
-
 export interface RoomDeps {
   timings: Timings;
   logger: Logger;
   rng: () => number;
   packs: PackProvider;
   media: MediaPipeline;
-  twitchEnabled: boolean;
-  createTwitch(): TwitchVoteSource;
   limits: { maxRoomFiles: number; maxRoomBytes: number };
   /** Состояние комнаты изменилось — разослать снапшоты. */
   onChange(room: Room): void;
@@ -98,8 +90,6 @@ export interface GameHandle {
   readonly totalRounds: number;
   roundStateFor(playerId: string): RoundState | null;
   history(): HistoryRound[];
-  /** Голос зрителя из чата: номер варианта с единицы. */
-  audienceVote(user: string, choice: number): void;
   /** Игрок ушёл или исключён. */
   onPlayerGone(playerId: string): void;
   /** Кто-то подключился или отключился — пересчитать условия ожидания. */

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { unlockAudio } from '../audio/sfx';
 import { Page } from '../components/Layout';
+import { Onboarding } from '../components/Onboarding';
 import { ProfileEditor } from '../components/ProfileEditor';
 import { Button, Card, Modal, Notice, Spinner } from '../components/ui';
 import { useErrorText } from '../lib/hooks';
@@ -211,6 +212,7 @@ function RoomView({ state }: { state: RoomState }) {
   return (
     <>
       <ConnectionBanner />
+      {phase === 'lobby' && <Onboarding />}
       <p className="sr-only" role="status" aria-live="polite">
         {t(`phases.${phase}`)}
       </p>

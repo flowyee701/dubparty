@@ -7,11 +7,10 @@ import {
   type PublicPlayer,
   type RoomState,
   type Settings,
-  type TwitchState,
 } from '@dubparty/shared';
 import { AppError } from '../util/errors';
 import { hashToken, newId, newToken } from '../util/ids';
-import type { GameHandle, RoomDeps, TwitchVoteSource } from './types';
+import type { GameHandle, RoomDeps } from './types';
 
 export interface RoomPlayer {
   id: string;
@@ -41,21 +40,17 @@ export class Room {
   hostId = '';
   settings: Settings = { ...DEFAULT_SETTINGS };
   game: GameHandle | null = null;
-  twitch: TwitchState;
 
   /** Учёт файлов комнаты для лимитов. */
   fileCount = 0;
   fileBytes = 0;
 
   private hostTimer: NodeJS.Timeout | null = null;
-  private twitchSource: TwitchVoteSource | null = null;
 
   constructor(
     readonly code: string,
     readonly deps: RoomDeps,
-  ) {
-    this.twitch = { enabled: deps.twitchEnabled, channel: null, status: 'off' };
-  }
+  ) {}
 
   // ── Состояние ───────────────────────────────────────────────────────────
 
@@ -242,38 +237,6 @@ export class Room {
     this.players = this.players.filter((p) => p.connected);
   }
 
-  // ── Twitch ──────────────────────────────────────────────────────────────
-
-  async connectTwitch(channel: string): Promise<void> {
-    if (!this.twitch.enabled) throw new AppError('FORBIDDEN', 'Twitch integration is disabled');
-    await this.disconnectTwitch();
-    const source = this.deps.createTwitch();
-    this.twitchSource = source;
-    this.twitch = { enabled: true, channel, status: 'connecting' };
-    this.changed();
-    try {
-      await source.connect(channel, (user, choice) => this.game?.audienceVote(user, choice));
-      if (this.twitchSource !== source) return;
-      this.twitch = { enabled: true, channel, status: 'connected' };
-    } catch (err) {
-      this.deps.logger.warn({ err, room: this.code, channel }, 'twitch connect failed');
-      if (this.twitchSource !== source) return;
-      this.twitchSource = null;
-      await source.disconnect().catch(() => {});
-      this.twitch = { enabled: true, channel, status: 'error' };
-    }
-    this.touch();
-    this.changed();
-  }
-
-  async disconnectTwitch(): Promise<void> {
-    const source = this.twitchSource;
-    this.twitchSource = null;
-    this.twitch = { enabled: this.twitch.enabled, channel: null, status: 'off' };
-    if (source) await source.disconnect().catch(() => {});
-    this.changed();
-  }
-
   // ── Внутреннее ──────────────────────────────────────────────────────────
 
   /** Убирает игрока: в лобби — насовсем, в игре — помечает ушедшим (он остаётся в истории). */
@@ -387,7 +350,6 @@ export class Room {
       totalRounds: this.game?.totalRounds ?? this.settings.rounds,
       round: this.game?.roundStateFor(playerId) ?? null,
       history: this.game?.history() ?? [],
-      twitch: this.twitch,
     };
   }
 
@@ -397,8 +359,5 @@ export class Room {
     for (const p of this.players) this.clearDisconnectTimer(p);
     this.game?.dispose();
     this.game = null;
-    const source = this.twitchSource;
-    this.twitchSource = null;
-    if (source) void source.disconnect().catch(() => {});
   }
 }

@@ -7,9 +7,26 @@ export interface Player {
 }
 
 /** Открывает отдельный контекст браузера — как отдельное устройство игрока. */
-export async function newPlayer(browser: Browser, name: string): Promise<Player> {
+/** Помечает онбординг пройденным: большинству сценариев он только мешает. */
+export async function skipOnboarding(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('dubparty:prefs')) {
+      localStorage.setItem(
+        'dubparty:prefs',
+        JSON.stringify({ state: { onboarded: true, theme: 'dark', sfx: false }, version: 1 }),
+      );
+    }
+  });
+}
+
+export async function newPlayer(
+  browser: Browser,
+  name: string,
+  options: { onboarding?: boolean } = {},
+): Promise<Player> {
   const context = await browser.newContext();
   const page = await context.newPage();
+  if (!options.onboarding) await skipOnboarding(page);
   // В Chromium микрофон подменяет сам браузер (флаги фейкового устройства);
   // в WebKit таких флагов нет, поэтому подставляем генератор тона.
   if (browser.browserType().name() === 'webkit') await useToneMic(page);

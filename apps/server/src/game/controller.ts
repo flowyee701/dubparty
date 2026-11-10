@@ -34,14 +34,4 @@ export class GameController {
     room.requirePhase('final');
     room.resetToLobby();
   }
-
-  connectTwitch(room: Room, playerId: string, channel: string): Promise<void> {
-    room.requireHost(playerId);
-    return room.connectTwitch(channel);
-  }
-
-  disconnectTwitch(room: Room, playerId: string): Promise<void> {
-    room.requireHost(playerId);
-    return room.disconnectTwitch();
-  }
 }

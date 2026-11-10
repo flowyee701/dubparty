@@ -1,4 +1,10 @@
 export const studio = {
+  onboarding: {
+    howTitle: 'Как играть',
+    micTitle: 'Проверим микрофон',
+    skip: 'Пропустить',
+    toMic: 'Дальше: микрофон',
+  },
   studio: {
     clip: 'Клип «{{title}}»',
     lines: 'Реплики',

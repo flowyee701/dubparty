@@ -70,8 +70,6 @@ const envSchema = z.object({
   HTTP_RATE_LIMIT: z.coerce.number().int().min(10).default(600),
   UPLOAD_RATE_LIMIT: z.coerce.number().int().min(1).default(60),
 
-  TWITCH_ENABLED: bool.default(true),
-
   /** Каталог собранного клиента. По умолчанию apps/client/dist. */
   CLIENT_DIST: optionalString,
   /** Переопределение длительностей фаз (JSON) — для тестов. */

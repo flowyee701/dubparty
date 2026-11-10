@@ -96,8 +96,6 @@ export const SCORING = {
   categoryWin: 50,
   /** За то, что проголосовал во всех доступных категориях. */
   votedBonus: 25,
-  /** Фавориту зрителей Twitch. */
-  audienceWin: 100,
 } as const;
 
 export const SYNC = {
@@ -135,7 +133,6 @@ export const LIMITS = {
   /** Допустимое смещение начала записи относительно видео. */
   takeOffsetAbsMaxMs: 10_000,
   socketPayloadBytes: 16 * 1024,
-  twitchChannelMax: 25,
 } as const;
 
 export const PACK_FORMAT_VERSION = 1;

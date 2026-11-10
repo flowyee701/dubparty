@@ -8,7 +8,7 @@ const STEP_ICONS = ['🚪', '🎬', '🎙', '🍿', '🏆'];
 const MODE_ICONS = { parallel: '🎤', roles: '🎭', free: '🌀' } as const;
 
 /** Содержимое «Как играть» — используется и на отдельной странице, и в онбординге. */
-export function HowToPlay() {
+export function HowToPlay({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-6">
@@ -28,6 +28,15 @@ export function HowToPlay() {
           </li>
         ))}
       </ol>
+      {!compact && <HowDetails />}
+    </div>
+  );
+}
+
+function HowDetails() {
+  const { t } = useTranslation();
+  return (
+    <>
       <section aria-labelledby="how-modes">
         <h2 id="how-modes" className="mb-2 text-lg font-bold">
           {t('how.modesTitle')}
@@ -53,7 +62,7 @@ export function HowToPlay() {
           ))}
         </ul>
       </section>
-    </div>
+    </>
   );
 }
 

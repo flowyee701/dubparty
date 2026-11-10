@@ -14,10 +14,9 @@ import { formatClock, useErrorText, useRemainingMs } from '../lib/hooks';
 import { request } from '../net/socket';
 import { toast } from '../store/toasts';
 
-export const CATEGORY_ICONS: Record<VoteCategory | 'audience', string> = {
+export const CATEGORY_ICONS: Record<VoteCategory, string> = {
   funniest: '😂',
   acting: '🎭',
-  audience: '📺',
 };
 
 function CategoryVote({
@@ -158,13 +157,6 @@ export function Voting({ state, round }: { state: RoomState; round: RoundState }
       <div aria-live="polite">
         {canVote && done && <Notice tone="success">{t('voting.doneHint')}</Notice>}
       </div>
-
-      {state.twitch.status === 'connected' && (
-        <Notice tone="info" title={`${CATEGORY_ICONS.audience} ${t('voting.twitchTitle')}`}>
-          {t('voting.twitchHint', { max: round.voteTargets.length })}{' '}
-          <strong>{t('voting.audienceVotes', { count: round.audienceVotes })}</strong>
-        </Notice>
-      )}
 
       <Modal
         open={!!rewatch && !!rewatchEntry}

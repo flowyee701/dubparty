@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
+import { skipOnboarding } from './helpers';
 
 const VIDEO = path.resolve('apps/server/assets/demo-pack/clips/catdog/video.mp4');
 
@@ -9,6 +10,8 @@ test('редактор паков: загрузка, реплики, обрез�
 }, testInfo) => {
   // Данные сервера переживают прогоны, поэтому название уникально для каждого запуска.
   const packTitle = `Тестовый пак ${testInfo.project.name} ${Date.now() % 1_000_000}`;
+
+  await skipOnboarding(page);
 
   // ── Создание пака и загрузка видео ──
   await page.goto('/packs');

@@ -1,4 +1,4 @@
-import type { RoomState, RoundState, TallyCategory } from '@dubparty/shared';
+import { VOTE_CATEGORIES, type RoomState, type RoundState } from '@dubparty/shared';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { playSfx } from '../audio/sfx';
@@ -10,8 +10,6 @@ import { useErrorText, useRemainingMs } from '../lib/hooks';
 import { request } from '../net/socket';
 import { toast } from '../store/toasts';
 import { CATEGORY_ICONS } from './Voting';
-
-const CATEGORIES: TallyCategory[] = ['funniest', 'acting', 'audience'];
 
 export function Results({ state, round }: { state: RoomState; round: RoundState }) {
   const { t } = useTranslation();
@@ -25,7 +23,7 @@ export function Results({ state, round }: { state: RoomState; round: RoundState 
     playSfx('success');
   }, []);
 
-  const winners = CATEGORIES.flatMap((category) => {
+  const winners = VOTE_CATEGORIES.flatMap((category) => {
     const ids = results?.winners[category] ?? [];
     if (ids.length === 0) return [];
     const names = ids

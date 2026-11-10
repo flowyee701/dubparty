@@ -72,7 +72,6 @@ export function registerRoutes(
 
   fastify.get('/api/config', async (): Promise<PublicConfig> => ({
     version: APP_VERSION,
-    twitchEnabled: config.TWITCH_ENABLED,
     limits: {
       clipUploadMaxBytes: LIMITS.clipUploadMaxBytes,
       clipMaxDurationMs: LIMITS.clipMaxDurationMs,

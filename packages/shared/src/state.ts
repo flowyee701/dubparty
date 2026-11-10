@@ -66,7 +66,6 @@ export interface RoundState {
   yourVotes: Partial<Record<VoteCategory, string>>;
   /** Игроки, проголосовавшие во всех доступных им категориях. */
   votedIds: string[];
-  audienceVotes: number;
   results: RoundScore | null;
 }
 
@@ -75,14 +74,6 @@ export interface HistoryRound {
   clipTitle: string;
   mode: GameMode;
   entries: EntryPublic[];
-}
-
-export type TwitchStatus = 'off' | 'connecting' | 'connected' | 'error';
-
-export interface TwitchState {
-  enabled: boolean;
-  channel: string | null;
-  status: TwitchStatus;
 }
 
 export interface RoomState {
@@ -100,7 +91,6 @@ export interface RoomState {
   round: RoundState | null;
   /** Завершённые раунды — для скачивания озвучек. */
   history: HistoryRound[];
-  twitch: TwitchState;
 }
 
 export interface PackSummary {
@@ -139,7 +129,6 @@ export interface PackDetail extends PackSummary {
 
 export interface PublicConfig {
   version: string;
-  twitchEnabled: boolean;
   limits: {
     clipUploadMaxBytes: number;
     clipMaxDurationMs: number;

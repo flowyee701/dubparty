@@ -198,18 +198,6 @@ export function attachSockets(
       return null;
     });
 
-    on('twitch:connect', async ({ channel }) => {
-      const { room, player } = current();
-      await game.connectTwitch(room, player.id, channel);
-      return null;
-    });
-
-    on('twitch:disconnect', async () => {
-      const { room, player } = current();
-      await game.disconnectTwitch(room, player.id);
-      return null;
-    });
-
     on('time:sync', ({ clientTime }) => ({ clientTime, serverTime: Date.now() }));
 
     socket.on('disconnect', () => leaveCurrent(socket));

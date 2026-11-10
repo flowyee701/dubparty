@@ -3,7 +3,7 @@ import { silentLogger } from '../logger';
 import { GameController } from './controller';
 import { Room, type RoomPlayer } from './room';
 import type { GameSession } from './session';
-import type { MediaPipeline, PlayablePack, RoomDeps, TwitchVoteSource } from './types';
+import type { MediaPipeline, PlayablePack, RoomDeps } from './types';
 
 /** Детерминированный генератор для воспроизводимых перемешиваний. */
 export function seededRng(seed = 1): () => number {
@@ -47,11 +47,6 @@ export const TEST_PACK: PlayablePack = {
   ],
 };
 
-export interface FakeTwitch extends TwitchVoteSource {
-  emit(user: string, choice: number): void;
-  connected: boolean;
-}
-
 export interface TestRoom {
   room: Room;
   game: GameController;
@@ -64,7 +59,6 @@ export interface TestRoom {
     removed: { socketId: string | null; reason: string }[];
     ended: number;
   };
-  twitch: FakeTwitch | null;
   /** Добавляет игрока и сразу «подключает» его сокет. */
   add(nickname: string): RoomPlayer & { token: string };
   /** Имитирует загрузку дубля. */
@@ -79,13 +73,11 @@ export function createTestRoom(
     pack?: PlayablePack;
     failTakeFor?: Set<string>;
     failReview?: boolean;
-    twitchFails?: boolean;
   } = {},
 ): TestRoom {
   const calls: TestRoom['calls'] = { processTake: [], buildReview: 0 };
   const events: TestRoom['events'] = { changes: 0, playback: [], removed: [], ended: 0 };
   const pack = options.pack ?? TEST_PACK;
-  let twitch: FakeTwitch | null = null;
 
   const media: MediaPipeline = {
     async processTake(args) {
@@ -108,24 +100,6 @@ export function createTestRoom(
       getPlayable: (id) => (id === pack.id ? pack : null),
     },
     media,
-    twitchEnabled: true,
-    createTwitch: () => {
-      let onVote: ((user: string, choice: number) => void) | null = null;
-      twitch = {
-        connected: false,
-        async connect(_channel, cb) {
-          if (options.twitchFails) throw new Error('no twitch');
-          onVote = cb;
-          this.connected = true;
-        },
-        async disconnect() {
-          onVote = null;
-          this.connected = false;
-        },
-        emit: (user, choice) => onVote?.(user, choice),
-      };
-      return twitch;
-    },
     limits: { maxRoomFiles: 1000, maxRoomBytes: 1e12 },
     onChange: () => void events.changes++,
     onPlayback: (_room, state) => void events.playback.push(state),
@@ -144,9 +118,6 @@ export function createTestRoom(
     media,
     calls,
     events,
-    get twitch() {
-      return twitch;
-    },
     session: () => game.of(room),
     add(nickname) {
       const { player, token } = room.join(profile(nickname));

@@ -54,8 +54,6 @@ interface RoundRecord {
   playback: PlaybackState | null;
   targets: VoteTarget[];
   votes: Map<string, Partial<Record<VoteCategory, string>>>;
-  /** Голоса зрителей: имя зрителя → идентификатор цели. */
-  audience: Map<string, string>;
   results: RoundScore | null;
 }
 
@@ -167,7 +165,6 @@ export class GameSession implements GameHandle {
       playback: null,
       targets: [],
       votes: new Map(),
-      audience: new Map(),
       results: null,
     };
     this.setPhase('intro', this.deps.timings.introMs, () => this.startRecording());
@@ -513,18 +510,6 @@ export class GameSession implements GameHandle {
     this.checkAllVoted();
   }
 
-  /** Голос зрителя Twitch: вариант — номер цели с единицы. Учитывается последний голос зрителя. */
-  audienceVote(user: string, choice: number): void {
-    if (this.phase !== 'voting') return;
-    const round = this.round;
-    const target = round.targets[choice - 1];
-    if (!target) return;
-    const isNew = !round.audience.has(user);
-    if (isNew && round.audience.size >= 50_000) return;
-    round.audience.set(user, target.id);
-    if (isNew) this.room.changed();
-  }
-
   private hasVotedFully(round: RoundRecord, playerId: string): boolean {
     if (eligibleTargets(round.targets, playerId).length === 0) return true;
     const votes = round.votes.get(playerId);
@@ -558,15 +543,10 @@ export class GameSession implements GameHandle {
         if (targetId) votes.push({ voterId, category, targetId });
       }
     }
-    const audience: Record<string, number> = {};
-    for (const targetId of round.audience.values()) {
-      audience[targetId] = (audience[targetId] ?? 0) + 1;
-    }
 
     round.results = computeRoundScore({
       targets: round.targets,
       votes,
-      audience,
       playerIds: this.room.activePlayers.map((p) => p.id),
     });
     for (const [playerId, delta] of Object.entries(round.results.deltas)) {
@@ -682,7 +662,6 @@ export class GameSession implements GameHandle {
       votedIds: votingOpen
         ? this.room.activePlayers.filter((p) => this.hasVotedFully(round, p.id)).map((p) => p.id)
         : [],
-      audienceVotes: round.audience.size,
       results: this.phase === 'results' || this.phase === 'final' ? round.results : null,
     };
   }

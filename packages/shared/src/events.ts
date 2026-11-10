@@ -10,7 +10,6 @@ import {
   sessionResumeSchema,
   settingsUpdateSchema,
   timeSyncSchema,
-  twitchConnectSchema,
   voteCastSchema,
 } from './schemas';
 import type { PlaybackState, RoomState, TakeStatus } from './state';
@@ -30,8 +29,6 @@ export const clientEventSchemas = {
   'vote:cast': voteCastSchema,
   'phase:continue': emptySchema,
   'game:restart': emptySchema,
-  'twitch:connect': twitchConnectSchema,
-  'twitch:disconnect': emptySchema,
   'time:sync': timeSyncSchema,
 } as const;
 
@@ -63,8 +60,6 @@ export interface ClientEventResults {
   'vote:cast': null;
   'phase:continue': null;
   'game:restart': null;
-  'twitch:connect': null;
-  'twitch:disconnect': null;
   'time:sync': { clientTime: number; serverTime: number };
 }
 

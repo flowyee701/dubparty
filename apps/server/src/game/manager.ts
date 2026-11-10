@@ -13,7 +13,7 @@ import { schema } from '../db';
 import { AppError } from '../util/errors';
 import { newRoomCode } from '../util/ids';
 import { Room, type RoomPlayer } from './room';
-import type { MediaPipeline, PackProvider, RoomDeps, TwitchVoteSource } from './types';
+import type { MediaPipeline, PackProvider, RoomDeps } from './types';
 
 /** Канал доставки событий игрокам. Реализуется слоем сокетов. */
 export interface RoomTransport {
@@ -30,7 +30,6 @@ export interface RoomTransport {
 export interface RoomManagerOptions {
   packs: PackProvider;
   media: MediaPipeline;
-  createTwitch(): TwitchVoteSource;
   timings?: Partial<Timings>;
   rng?: () => number;
 }
@@ -90,8 +89,6 @@ export class RoomManager {
       rng: this.options.rng ?? Math.random,
       packs: this.options.packs,
       media: this.options.media,
-      twitchEnabled: config.TWITCH_ENABLED,
-      createTwitch: this.options.createTwitch,
       limits: {
         maxRoomFiles: config.MAX_ROOM_FILES,
         maxRoomBytes: config.MAX_ROOM_MB * 1024 * 1024,

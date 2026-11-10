@@ -55,3 +55,27 @@ test('несуществующая комната и неверный код', a
   await page.goto('/r/12');
   await expect(page.getByRole('heading')).toContainText('неверный код');
 });
+
+test('онбординг перед первой игрой: как играть и проверка микрофона', async ({ browser }) => {
+  const player = await newPlayer(browser, 'Новичок', { onboarding: true });
+  const { page } = player;
+  await page.goto('/');
+  await page.getByLabel('Ник').fill('Новичок');
+  await page.getByRole('button', { name: 'Создать комнату' }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Как играть' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('Соберите комнату');
+  await dialog.getByRole('button', { name: 'Дальше: микрофон' }).click();
+
+  const mic = page.getByRole('dialog', { name: 'Проверим микрофон' });
+  await expect(mic.getByLabel('Устройство ввода')).toBeVisible();
+  await mic.getByRole('button', { name: 'Меня слышно, продолжить' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  // Второй раз онбординг не показывается
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Игроки' })).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await player.context.close();
+});

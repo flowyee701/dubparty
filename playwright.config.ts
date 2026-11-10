@@ -34,7 +34,6 @@ export default defineConfig({
       STORAGE_DIR: './.e2e-data/storage',
       LOG_LEVEL: 'warn',
       SEED_CALIBRATION_PACK: 'true',
-      TWITCH_ENABLED: 'false',
       // Короткие фазы, чтобы полный цикл укладывался в разумное время.
       DUBPARTY_TIMINGS: JSON.stringify({
         introMs: 2500,

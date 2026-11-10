@@ -11,21 +11,18 @@ export interface CastVote {
   targetId: string;
 }
 
-export type TallyCategory = VoteCategory | 'audience';
-
 export interface ScoreDelta {
   votes: number;
   wins: number;
   voted: number;
-  audience: number;
   total: number;
 }
 
 export interface RoundScore {
   /** Число голосов по каждой цели и категории. */
-  tallies: Record<string, Record<TallyCategory, number>>;
+  tallies: Record<string, Record<VoteCategory, number>>;
   /** Лидеры категорий (несколько при ничьей; пусто, если голосов не было). */
-  winners: Record<TallyCategory, string[]>;
+  winners: Record<VoteCategory, string[]>;
   /** Начисления игрокам. */
   deltas: Record<string, ScoreDelta>;
 }
@@ -43,10 +40,10 @@ export function eligibleTargets<T extends ScoreTarget>(
 }
 
 function emptyDelta(): ScoreDelta {
-  return { votes: 0, wins: 0, voted: 0, audience: 0, total: 0 };
+  return { votes: 0, wins: 0, voted: 0, total: 0 };
 }
 
-function leaders(tallies: Record<string, Record<TallyCategory, number>>, category: TallyCategory) {
+function leaders(tallies: Record<string, Record<VoteCategory, number>>, category: VoteCategory) {
   let best = 0;
   let ids: string[] = [];
   for (const [id, t] of Object.entries(tallies)) {
@@ -69,16 +66,14 @@ function leaders(tallies: Record<string, Record<TallyCategory, number>>, categor
 export function computeRoundScore(input: {
   targets: readonly ScoreTarget[];
   votes: readonly CastVote[];
-  /** Голоса зрителей: цель → число голосов. */
-  audience?: Readonly<Record<string, number>>;
   /** Игроки, участвующие в раунде (для нулевых строк в таблице). */
   playerIds: readonly string[];
 }): RoundScore {
-  const { targets, votes, audience = {}, playerIds } = input;
+  const { targets, votes, playerIds } = input;
   const byId = new Map(targets.map((t) => [t.id, t]));
 
   const tallies: RoundScore['tallies'] = {};
-  for (const t of targets) tallies[t.id] = { funniest: 0, acting: 0, audience: 0 };
+  for (const t of targets) tallies[t.id] = { funniest: 0, acting: 0 };
 
   const deltas: Record<string, ScoreDelta> = {};
   for (const id of playerIds) deltas[id] = emptyDelta();
@@ -99,14 +94,9 @@ export function computeRoundScore(input: {
     set.add(v.category);
   }
 
-  for (const [targetId, n] of Object.entries(audience)) {
-    if (tallies[targetId] && n > 0) tallies[targetId].audience = Math.floor(n);
-  }
-
   const winners = {
     funniest: leaders(tallies, 'funniest'),
     acting: leaders(tallies, 'acting'),
-    audience: leaders(tallies, 'audience'),
   };
 
   for (const category of VOTE_CATEGORIES) {
@@ -114,15 +104,12 @@ export function computeRoundScore(input: {
       for (const a of byId.get(id)!.authorIds) deltaOf(a).wins += SCORING.categoryWin;
     }
   }
-  for (const id of winners.audience) {
-    for (const a of byId.get(id)!.authorIds) deltaOf(a).audience += SCORING.audienceWin;
-  }
 
   for (const [voterId, set] of votedCategories) {
     if (set.size === VOTE_CATEGORIES.length) deltaOf(voterId).voted += SCORING.votedBonus;
   }
 
-  for (const d of Object.values(deltas)) d.total = d.votes + d.wins + d.voted + d.audience;
+  for (const d of Object.values(deltas)) d.total = d.votes + d.wins + d.voted;
   return { tallies, winners, deltas };
 }
 

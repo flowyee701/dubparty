@@ -22,17 +22,15 @@ describe('computeRoundScore', () => {
       ],
     });
 
-    expect(score.tallies['e-b']).toEqual({ funniest: 2, acting: 0, audience: 0 });
+    expect(score.tallies['e-b']).toEqual({ funniest: 2, acting: 0 });
     expect(score.winners.funniest).toEqual(['e-b']);
     expect(score.winners.acting).toEqual(['e-c']);
-    expect(score.winners.audience).toEqual([]);
 
     // b: 2 голоса + победа + бонус за голосование
     expect(score.deltas.b).toEqual({
       votes: 2 * SCORING.perVote,
       wins: SCORING.categoryWin,
       voted: SCORING.votedBonus,
-      audience: 0,
       total: 2 * SCORING.perVote + SCORING.categoryWin + SCORING.votedBonus,
     });
     // a: по одному голосу в каждой категории, побед нет
@@ -108,24 +106,10 @@ describe('computeRoundScore', () => {
     expect(score.deltas.a!.wins).toBe(SCORING.categoryWin);
   });
 
-  it('голоса зрителей — отдельная категория и не влияют на основные', () => {
-    const score = computeRoundScore({
-      targets,
-      playerIds,
-      votes: [{ voterId: 'a', category: 'funniest', targetId: 'e-b' }],
-      audience: { 'e-c': 7, 'e-a': 2, ghost: 99 },
-    });
-    expect(score.winners.audience).toEqual(['e-c']);
-    expect(score.winners.funniest).toEqual(['e-b']);
-    expect(score.deltas.c!.audience).toBe(SCORING.audienceWin);
-    expect(score.deltas.c!.votes).toBe(0);
-    expect(score.tallies.ghost).toBeUndefined();
-  });
-
   it('без голосов никто ничего не получает', () => {
     const score = computeRoundScore({ targets, playerIds, votes: [] });
     expect(Object.values(score.deltas).every((d) => d.total === 0)).toBe(true);
-    expect(score.winners).toEqual({ funniest: [], acting: [], audience: [] });
+    expect(score.winners).toEqual({ funniest: [], acting: [] });
   });
 });
 

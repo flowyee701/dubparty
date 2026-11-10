@@ -7,7 +7,6 @@ import {
   roomCodeSchema,
   settingsSchema,
   takeUploadQuerySchema,
-  twitchConnectSchema,
 } from './schemas';
 
 describe('nicknameSchema', () => {
@@ -120,14 +119,6 @@ describe('события', () => {
     expect(s.safeParse({ action: 'seek', positionMs: 1500 }).success).toBe(true);
     expect(s.safeParse({ action: 'seek' }).success).toBe(false);
     expect(s.safeParse({ action: 'explode' }).success).toBe(false);
-  });
-
-  it('twitch:connect нормализует имя канала', () => {
-    expect(twitchConnectSchema.parse({ channel: 'https://twitch.tv/Some_Channel/' }).channel).toBe(
-      'some_channel',
-    );
-    expect(twitchConnectSchema.parse({ channel: '#MyChan' }).channel).toBe('mychan');
-    expect(twitchConnectSchema.safeParse({ channel: 'a b' }).success).toBe(false);
   });
 
   it('параметры загрузки дубля приводятся из строк', () => {
