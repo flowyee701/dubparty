@@ -5,6 +5,11 @@ FROM node:24-bookworm-slim AS build
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH CI=true
 # В образе используется системный ffmpeg — бинарник из npm не скачиваем.
 ENV FFMPEG_BIN=/usr/bin/ffmpeg
+# Компилятор нужен только на этапе сборки: если для платформы нет готового бинарника
+# better-sqlite3 (так бывает на arm64), модуль собирается из исходников.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 make g++ \
+ && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm@9.15.9
 WORKDIR /app
 
@@ -21,7 +26,9 @@ RUN pnpm build
 
 # Только продакшен-зависимости сервера, без dev-инструментов.
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm --filter @dubparty/server deploy --prod /out/server
+    pnpm --filter @dubparty/server deploy --prod /out/server \
+ # В образе работает системный ffprobe; бинарники из npm под все платформы (300+ МБ) не нужны.
+ && rm -rf /out/server/node_modules/.pnpm/ffprobe-static@*/node_modules/ffprobe-static/bin
 
 # ── Рантайм ───────────────────────────────────────────────────────────────
 FROM node:24-bookworm-slim AS runtime
@@ -47,9 +54,10 @@ COPY --from=build /app/apps/client/dist ./client
 COPY --from=build /app/apps/server/package.json ./package.json
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
+# Файлы приложения остаются за root и доступны только на чтение; серверу нужен лишь каталог данных.
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && mkdir -p /data/db /data/storage \
- && chown -R node:node /data /app
+ && chown -R node:node /data
 VOLUME ["/data"]
 EXPOSE 3001
 

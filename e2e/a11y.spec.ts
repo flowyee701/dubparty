@@ -67,11 +67,15 @@ for (const theme of ['dark', 'light'] as const) {
   });
 }
 
-test('с клавиатуры: до главного действия можно дойти и активировать его', async ({ page }) => {
+test('с клавиатуры: до главного действия можно дойти и активировать его', async ({
+  page,
+  browserName,
+}) => {
   await setTheme(page, 'dark');
   await page.goto('/');
-  // Первая остановка Tab — ссылка «Перейти к содержимому»
-  await page.keyboard.press('Tab');
+  // Первая остановка Tab — ссылка «Перейти к содержимому». Safari по умолчанию обходит
+  // ссылки по Option+Tab (так настроена macOS), поэтому в WebKit жмём именно его.
+  await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
   await expect(page.getByRole('link', { name: 'Перейти к содержимому' })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
